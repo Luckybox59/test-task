@@ -1,0 +1,22 @@
+{
+  "users": [
+    {
+      "firstName": "Петр",
+      "lastName": "Петухов",
+      "email": "hot59@gmail.com",
+      "country": "Россия",
+      "city": "Воронеж",
+      "about": "Обо мне2",
+      "id": 1
+    },
+    {
+      "firstName": "Игорь",
+      "lastName": "Бяков",
+      "email": "Luckybox59@gmail.com",
+      "country": "Россия",
+      "city": "Пермь",
+      "about": "Обо мне",
+      "id": 2
+    }
+  ]
+}
