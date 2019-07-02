@@ -1,50 +1,39 @@
 <template>
-  <div class="container">
-      <div class="container my-5">
-          <div class="row">
-            <div class="col-12 col-lg-3">
-              <div class="card shadow-sm">
-                <div class="card-header font-weight-bold text-muted">
-                  Настройки
-                </div>
-                <div class="list-group list-group-flush">
-                  <div v-on:click="select">
-                    <router-link class="nav-link list-group-item list-group-item-action" to="/profile">Профиль</router-link>
-                  </div>
-                  <div v-on:click="select">
-                    <router-link class="nav-link list-group-item list-group-item-action" to="/balance">Баланс</router-link>
-                  </div>
-                  <div v-on:click="select">
-                    <router-link class="nav-link list-group-item list-group-item-action" to="/billing_history">История оплат</router-link>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 col-lg-9 mt-5 mt-lg-0">
-              <router-view v-bind:category="currentItem"></router-view>
-            </div>
-          </div>
-        </div>
+  <div>
+  <ul class="nav justify-content-end">
+      <li v-if="!signIn" class="nav-item">
+        <router-link class="nav-link" to="/my">Войти</router-link>
+      </li>
+    <li v-if="!signIn" class="nav-item">
+      <router-link class="nav-link" to="/login">Вход</router-link>
+    </li>
+    <li v-if="!signIn" class="nav-item">
+      <router-link class="nav-link" to="/register">Регистрация</router-link>
+    </li>
+    <li v-if="signIn" @click="signOut" class="nav-item">
+      <a href="#" class="nav-link">Выйти</a>
+    </li>
+  </ul>
+  <router-view @reg-success="signIn = $event.signIn"></router-view>
   </div>
 </template>
 <script>
-  import axios from 'axios';
   export default {
     data() {
       return {
-        info: null,
-        currentItem: 'Профиль'
+        signIn: false
       }
     },
     methods: {
-      select(e) {
-        this.currentItem = e.target.textContent;
-      }
-    },
-    filters: {
-      currencydecimal(value) {
-        return value.toFixed(2)
+      signOut() {
+        this.signIn = false;
+        this.$router.push({ name: 'login' });
       }
     }
   }
 </script>
+<style scope>
+  .nav {
+    box-shadow: 0 0 5px 0 grey;
+  }
+</style>

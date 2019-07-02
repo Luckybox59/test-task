@@ -1,66 +1,69 @@
 <template>
   <div>
-<h3>{{ category }}</h3>
+<h3>Профиль</h3>
 <form @submit.prevent="onSubmit">
         <label for="validationDefault01">Имя</label>
-        <input type="text" class="form-control" id="validationDefault01" v-model.lazy="firstName" required>
+        <input type="text" class="form-control" id="validationDefault01" v-model.lazy="user.firstName" required>
 
         <label class="mt-3" for="validationDefault02">Фамилия</label>
-        <input type="text" class="form-control" id="validationDefault02" v-model.lazy="lastName" required>
+        <input type="text" class="form-control" id="validationDefault02" v-model.lazy="user.lastName" required>
         
         <label class="mt-3" for="validationDefaultUsername">Email</label>
-        <input type="text" class="form-control" id="validationDefaultUsername" v-model.lazy="email" aria-describedby="inputGroupPrepend2" required>
+        <input type="text" class="form-control" id="validationDefaultUsername" v-model.lazy="user.email" aria-describedby="inputGroupPrepend2" required>
         
         <label class="mt-3" for="validationDefault03">Город</label>
-        <input type="text" class="form-control" id="validationDefault03" v-model.lazy="city" required>
+        <input type="text" class="form-control" id="validationDefault03" v-model.lazy="user.city" required>
         
         <label class="mt-3" for="validationDefault04">Страна</label>
-        <input type="text" class="form-control" id="validationDefault04" v-model.lazy="country" required>
+        <input type="text" class="form-control" id="validationDefault04" v-model.lazy="user.country" required>
         
         <label class="mt-3" for="validationDefault05">Обо мне</label>
-        <textarea type="text" class="form-control" id="validationDefault05" v-model.lazy="about" required>{{ about }}</textarea>
+        <textarea type="text" class="form-control" id="validationDefault05" v-model.lazy="user.about" required>{{ user.about }}</textarea>
         <button class="btn btn-primary mt-3" type="submit">Сохранить</button>
   </form>
+  <p>{{ response }}</p>
   </div>
 </template>
 <script>
   import axios from 'axios'
 
   export default {
-    props: [
-      'category'
-    ],
     data() {
       return {
-        firstName: '',
-        lastName: '',
-        email: '',
-        country: '',
-        city: '',
-        about: '',
-        id: ''
+        user: {
+          firstName: '',
+          lastName: '',
+          email: '',
+          country: '',
+          city: '',
+          about: '',
+          id: '',
+        },
+        response: '',
       }
     },
     methods: {
       onSubmit() {
         const user = {
-          firstName: this.firstName,
-          lastName: this.lastName,
-          email: this.email,
-          country: this.country,
-          city: this.city,
-          about: this.about,
-          id: this.id,
+          firstName: this.user.firstName,
+          lastName: this.user.lastName,
+          email: this.user.email,
+          country: this.user.country,
+          city: this.user.city,
+          about: this.user.about,
+          id: this.user.id,
         }
-        axios.put(`http://localhost:3000/users/${user.id}`, user)
-          .catch(e => console.log(e));
+        //axios.put(`http://localhost:3000/users/${user.id}`, user)
+        //  .catch(e => console.log(e));
       }
     },
     mounted() {
       axios
-        .get('http://localhost:3000/users/2')
+        .get('http://localhost:3000/register')
         .then(response => {
-          Object.assign(this.$data, response.data);
+          console.log(response);
+          //this.response = response;
+          //Object.assign(this.$data.user, response.data);
         })
         .catch(e => console.log(e));
     }
