@@ -18,12 +18,10 @@
       :next-class="'page-item'"
       :prev-link-class="'page-link'"
       :next-link-class="'page-link'"
-      >
-    ></Paginate>
+      />
   </div>
 </template>
 <script>
-  import axios from 'axios'
   import HistoryTable from '../components/HistoryTable.vue'
   import paginationMixin from '../mixins/pagination.mixin'
     export default {
@@ -36,13 +34,13 @@
         }
       },
       mounted() {
-        axios
-        .get('http://localhost:3000/transactions')
-        .then(response => {
-          this.records = response.data[0].operations;
-          this.setupPagination(this.records);
-        })
-        .catch(e => console.log(e))
+        this.$store.dispatch('historyRequest')
+          .then(resp => this.records = resp.data);
+      },
+      watch: {
+        records: function(value) {
+          this.setupPagination(value)
+        }
       },
       components: {
         HistoryTable

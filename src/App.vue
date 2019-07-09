@@ -1,33 +1,28 @@
 <template>
   <div>
-  <ul class="nav justify-content-end">
-      <li v-if="!signIn" class="nav-item">
-        <router-link class="nav-link" to="/my">Войти</router-link>
+    <ul class="nav justify-content-end">
+      <li v-if="!isAuthenticated" class="nav-item">
+        <router-link class="nav-link" to="/login">Вход</router-link>
       </li>
-    <li v-if="!signIn" class="nav-item">
-      <router-link class="nav-link" to="/login">Вход</router-link>
-    </li>
-    <li v-if="!signIn" class="nav-item">
-      <router-link class="nav-link" to="/register">Регистрация</router-link>
-    </li>
-    <li v-if="signIn" @click="signOut" class="nav-item">
-      <a href="#" class="nav-link">Выйти</a>
-    </li>
-  </ul>
-  <router-view @reg-success="signIn = $event.signIn"></router-view>
+      <li v-if="!isAuthenticated" class="nav-item">
+        <router-link class="nav-link" to="/register">Регистрация</router-link>
+      </li>
+      <li v-if="isAuthenticated" @click="logout" class="nav-item">
+        <button type="button" class="btn btn-link">Выйти</button>
+      </li>
+    </ul>
+    <router-view @reg-success="signIn=$event.signIn"></router-view>
   </div>
 </template>
 <script>
+import { mapGetters, mapMutations, mapActions } from 'vuex'
+
   export default {
-    data() {
-      return {
-        signIn: false
-      }
-    },
+    computed: mapGetters(['isAuthenticated']),
     methods: {
-      signOut() {
-        this.signIn = false;
-        this.$router.push({ name: 'login' });
+      logout() {
+        this.$store.dispatch('authLogout')
+          .then(() => this.$router.push({ name: 'login' }))
       }
     }
   }
@@ -35,5 +30,8 @@
 <style scope>
   .nav {
     box-shadow: 0 0 5px 0 grey;
+  }
+  button {
+    text-decoration: none !important;
   }
 </style>

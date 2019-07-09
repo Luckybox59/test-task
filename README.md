@@ -1,18 +1,19 @@
-# myproject
-
-> A Vue.js project
-
+# test-task
+> Vue.js + Express.js
 ## Build Setup
-
 ``` bash
-# install dependencies
+# установка зависимостей
 npm install
 
-# serve with hot reload at localhost:8080
+# dev-сервер localhost:8080
 npm run dev
 
-# build for production with minification
-npm run build
+# http-сервер localhost:3000
+make nodemon
 ```
+Некоторые моменты:
 
-For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
+ - Новые юзеры сохраняются в массив, живут в течении сессии сервера.
+ - Единственный юзер в массиве изначально admin@mail.ru asdfgh
+ - Многие кейсы ошибок не обработанны, так что может неожиданно что-то не работать(попробуйте перелогинится).
+ - Чтобы после регистрации отправлялось письмо на почту нужно в файле /src/server/send-email.js указать пользовательские данные отправляющей почты и зайти в нее. После нажатия на ссылку в обьекте юзера меняется значение свойства verifyEmail на true.
