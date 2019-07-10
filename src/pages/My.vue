@@ -23,19 +23,19 @@
   </div>
 </template>
 <script>
-  export default {
-    data() {
-      return {
-        info: null,
-        currentItem: 'Профиль'
-      }
+export default {
+  data() {
+    return {
+      info: null,
+      currentItem: 'Профиль',
+    };
+  },
+  filters: {
+    currencydecimal(value) {
+      return value.toFixed(2);
     },
-    filters: {
-      currencydecimal(value) {
-        return value.toFixed(2)
-      }
-    }
-  }
+  },
+};
 </script>
 <style scope>
     .nav {

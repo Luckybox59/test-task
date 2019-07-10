@@ -25,27 +25,29 @@
   </div>
 </template>
 <script>
-  export default {
-    data() {
-      return {
-        user: {
-          firstName: '',
-          lastName: '',
-          email: '',
-          country: '',
-          city: '',
-          about: '',
-        }
-      }
+export default {
+  data() {
+    return {
+      user: {
+        firstName: '',
+        lastName: '',
+        email: '',
+        country: '',
+        city: '',
+        about: '',
+      },
+    };
+  },
+  methods: {
+    onSubmit() {
+      this.$store.dispatch('userEditProfile', this.user);
     },
-    methods: {
-      onSubmit() {
-        this.$store.dispatch('userEditProfile', this.user)
-      }
-    },
-    mounted() {
-      this.$store.dispatch('userRequest')
-       .then((resp) => this.user = {...this.user, ...resp.data })
-    }
-  }
+  },
+  mounted() {
+    this.$store.dispatch('userRequest')
+      .then((resp) => {
+        this.user = { ...this.user, ...resp.data };
+      });
+  },
+};
 </script>

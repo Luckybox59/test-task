@@ -15,17 +15,17 @@
   </div>
 </template>
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapGetters } from 'vuex';
 
-  export default {
-    computed: mapGetters(['isAuthenticated']),
-    methods: {
-      logout() {
-        this.$store.dispatch('authLogout')
-          .then(() => this.$router.push({ name: 'login' }))
-      }
-    }
-  }
+export default {
+  computed: mapGetters(['isAuthenticated']),
+  methods: {
+    logout() {
+      this.$store.dispatch('authLogout')
+        .then(() => this.$router.push({ name: 'login' }));
+    },
+  },
+};
 </script>
 <style scope>
   .nav {

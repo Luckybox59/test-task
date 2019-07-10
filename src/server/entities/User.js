@@ -6,7 +6,7 @@ const getId = () => {
 };
 
 export default class {
-  constructor({firstName, lastName, email, country, city, about, password, balance = 0, operations = []}) {
+  constructor({ firstName, lastName, email, country, city, about, password, balance = 0, operations = [] }) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;

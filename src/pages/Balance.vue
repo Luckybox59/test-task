@@ -29,39 +29,41 @@
   </div>
 </template>
 <script>
-  export default {
-    data() {
-      return {
-        balance: '',
-        payment: {
-          data: '',
-          isActive: false,
-        },
-        deposit: {
-          data: '',
-          isActive: false,
-        }
-      }
-    },
-    methods: {
-      activatePayment() {
-        this.payment.isActive = true;
-        this.deposit.isActive = false;
+export default {
+  data() {
+    return {
+      balance: '',
+      payment: {
+        data: '',
+        isActive: false,
       },
-      activateDeposit() {
-        this.deposit.isActive = true;
-        this.payment.isActive = false;
+      deposit: {
+        data: '',
+        isActive: false,
       },
-      onSubmit(calculateNewBalance) {
-          const newBalance = calculateNewBalance(+this.balance, +this.payment.data, +this.deposit.data);
-          this.balance = newBalance;
-          const action = event.target.dataset.action;
-          this.$store.dispatch('userEditTransactions', { balance: newBalance, action })
-      }
+    };
+  },
+  methods: {
+    activatePayment() {
+      this.payment.isActive = true;
+      this.deposit.isActive = false;
     },
-    mounted() {
-      this.$store.dispatch('balanceRequest')
-        .then(resp => this.balance = resp.data.balance)
-    }
-  }
+    activateDeposit() {
+      this.deposit.isActive = true;
+      this.payment.isActive = false;
+    },
+    onSubmit(calculateNewBalance) {
+      const newBalance = calculateNewBalance(+this.balance, +this.payment.data, +this.deposit.data);
+      this.balance = newBalance;
+      const { action } = event.target.dataset;
+      this.$store.dispatch('userEditTransactions', { balance: newBalance, action });
+    },
+  },
+  mounted() {
+    this.$store.dispatch('balanceRequest')
+      .then((resp) => {
+        this.balance = resp.data.balance;
+      });
+  },
+};
 </script>

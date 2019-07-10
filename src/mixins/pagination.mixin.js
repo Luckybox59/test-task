@@ -7,8 +7,8 @@ export default {
       pageSize: 5,
       pageCount: 0,
       allItems: [],
-      items: []
-    }
+      items: [],
+    };
   },
   methods: {
     changePage(pageNum) {
@@ -19,6 +19,6 @@ export default {
       this.allItems = chunk(incomingItems, this.pageSize);
       this.pageCount = this.allItems.length;
       this.changePage(this.page);
-    }
-  }
-}
+    },
+  },
+};

@@ -17,6 +17,28 @@ export default () => {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
+  const users = [
+    new User({
+      firstName: 'admin',
+      lastName: 'adminich',
+      email: 'admin@mail.ru',
+      country: 'Russia',
+      city: 'Perm',
+      password: bcrypt.hashSync('asdfgh', 8),
+      balance: 890,
+      operations: [
+        { date: '14 мая 2019', action: 'Оплата счета' },
+        { date: '13 мая 2019', action: 'Оплата счета' },
+        { date: '12 мая 2019', action: 'Оплата счета' },
+        { date: '11 мая 2019', action: 'Оплата счета' },
+        { date: '10 мая 2019', action: 'Пополнение счета' },
+        { date: '9 мая 2019', action: 'Оплата счета' },
+        { date: '8 мая 2019', action: 'Оплата счета' },
+        { date: '7 мая 2019', action: 'Оплата счета' },
+      ],
+    }),
+  ];
+
   const verifyToken = (req, res, next) => {
     const token = req.headers['authorization'];
     if (token) {
@@ -35,28 +57,6 @@ export default () => {
     }
   };
 
-  const users = [
-    new User({
-      firstName: 'admin',
-      lastName: 'adminich',
-      email: 'admin@mail.ru',
-      country: 'Russia',
-      city: 'Perm',
-      password: bcrypt.hashSync('asdfgh', 8),
-      balance: 890,
-      operations: [
-        { date: "14 мая 2019", action: "Оплата счета" },
-        { date: "13 мая 2019", action: "Оплата счета" },
-        { date: "12 мая 2019", action: "Оплата счета" },
-        { date: "11 мая 2019", action: "Оплата счета" },
-        { date: "10 мая 2019", action: "Пополнение счета" },
-        { date: "9 мая 2019", action: "Оплата счета" },
-        { date: "8 мая 2019", action: "Оплата счета" },
-        { date: "7 мая 2019", action: "Оплата счета" }
-      ],
-    })
-  ];
-
   const readOnlyProps = new Set(['password', 'id', 'verifyEmail', 'balance', 'operations']);
 
   app.post('/users/new', (req, res) => {
@@ -64,20 +64,20 @@ export default () => {
     const user = new User({ firstName, email, password: bcrypt.hashSync(password, 8) });
     users.push(user);
     jwt.sign({ id: user.id, email }, 'emailsecret', (err, token) => {
-      const verifyLink = `http://localhost:3000/users/new/verify?token=${token}`
+      const verifyLink = `http://localhost:3000/users/new/verify?token=${token}`;
       sendMail(email, verifyLink);
     });
-    jwt.sign({ id: user.id, email }, 'supersecret', { expiresIn: '2h' }, (err, token) => {
+    jwt.sign({ id: user.id, email }, 'supersecret', { expiresIn: '2h' }, () => {
       res.sendStatus(200);
     });
   });
 
   app.get('/users/verify/email', (req, res) => {
-     const { token } = req.query;
-     const decoded = jwt.verify(token, 'emailsecret');
-     const user = users.find(u => u.id === decoded.id);
-     user.verifyEmail = true;
-    res.sendfile(__dirname + '/views/verifyEmail.html')
+    const { token } = req.query;
+    const decoded = jwt.verify(token, 'emailsecret');
+    const user = users.find(u => u.id === decoded.id);
+    user.verifyEmail = true;
+    res.sendfile(`${__dirname}/views/verifyEmail.html`);
   });
 
   app.post('/session/new', (req, res) => {
@@ -87,7 +87,7 @@ export default () => {
       jwt.sign({ id: user.id, email }, 'supersecret', { expiresIn: '2h' }, (err, token) => {
         res.status(200).json({ token });
       });
-    } 
+    }
   });
 
   app.get('/users', verifyToken, (req, res) => {
@@ -99,7 +99,7 @@ export default () => {
   app.put('/users/edit', verifyToken, (req, res) => {
     const user = res.locals.user;
     const keys = Object.keys(req.body);
-    keys.forEach(prop => {
+    keys.forEach((prop) => {
       if (_.has(user, prop) && !readOnlyProps.has(prop)) {
         user[prop] = req.body[prop];
       }
@@ -124,14 +124,14 @@ export default () => {
   });
 
   app.patch('/users/edit/transactions', verifyToken, (req, res) => {
-    console.log(req.body)
+    console.log(req.body);
     const user = res.locals.user;
     const { balance, action } = req.body;
     moment.locale('ru');
     const date = moment().format('DD MMMM YYYY');
     user.balance = balance;
     user.operations.unshift({ date, action });
-    res.sendStatus(204)
+    res.sendStatus(204);
   });
 
   app.get('/users/history', verifyToken, (req, res) => {
@@ -143,6 +143,6 @@ export default () => {
     const user = res.locals.user;
     res.status(200).json({ balance: user.balance });
   });
-  
+
   return app;
 };

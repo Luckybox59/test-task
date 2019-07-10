@@ -22,28 +22,31 @@
   </div>
 </template>
 <script>
-  import HistoryTable from '../components/HistoryTable.vue'
-  import paginationMixin from '../mixins/pagination.mixin'
-    export default {
-      mixins: [
-        paginationMixin
-      ],
-      data() {
-        return {
-          records: []
-        }
-      },
-      mounted() {
-        this.$store.dispatch('historyRequest')
-          .then(resp => this.records = resp.data);
-      },
-      watch: {
-        records: function(value) {
-          this.setupPagination(value)
-        }
-      },
-      components: {
-        HistoryTable
-      }
-    }
-  </script>
+import HistoryTable from '../components/HistoryTable.vue';
+import paginationMixin from '../mixins/pagination.mixin';
+
+export default {
+  mixins: [
+    paginationMixin,
+  ],
+  data() {
+    return {
+      records: [],
+    };
+  },
+  mounted() {
+    this.$store.dispatch('historyRequest')
+      .then((resp) => {
+        this.records = resp.data;
+      });
+  },
+  watch: {
+    records(value) {
+      this.setupPagination(value);
+    },
+  },
+  components: {
+    HistoryTable,
+  },
+};  
+</script>

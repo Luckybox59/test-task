@@ -19,22 +19,24 @@
   </div>
 </template>
 <script>
-  export default {
-    data() {
-      return {
-        user: {
-          currentPassword: '',
-          newPassword: '',
-          confirmNewPassword: ''
-        },
-        message: ''
-      }
+export default {
+  data() {
+    return {
+      user: {
+        currentPassword: '',
+        newPassword: '',
+        confirmNewPassword: '',
+      },
+      message: '',
+    };
+  },
+  methods: {
+    onSubmit() {
+      this.$store.dispatch('userEditPassword', this.user)
+        .then((resp) => {
+          this.message = resp.data.message;
+        });
     },
-    methods: {
-      onSubmit() {
-        this.$store.dispatch('userEditPassword', this.user)
-           .then((resp) => this.message = resp.data.message)
-      }
-    }
-  }
+  },
+};
 </script>

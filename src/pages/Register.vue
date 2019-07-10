@@ -23,26 +23,25 @@
 </template>
 
 <script>
-  import axios from 'axios'
-
-  export default {
-    data() {
-      return {
-        user: {
-          email: '',
-          firstName: '',
-          password: ''
-        }
-      }
+export default {
+  data() {
+    return {
+      user: {
+        email: '',
+        firstName: '',
+        password: '',
+      },
+    };
+  },
+  methods: {
+    onSubmit() {
+      this.$store.dispatch('userCreateNew', this.user)
+        .then(() => {
+          this.$router.push({ name: 'profile' });
+        })
+        .catch(e => console.log(e));
     },
-    methods: {
-      onSubmit() {
-        this.$store.dispatch('userCreateNew', this.user)
-          .then((resp) => {
-            this.$router.push({ name: 'profile'})
-          })
-          .catch(e => console.log(e))
-      }
-    }
-  }
+  },
+};
+
 </script>

@@ -5,16 +5,15 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: 'lucky.test.mail.send@gmail.com',
     pass: '654ppp321',
-  }
+  },
 });
 
 export default (to, link) => {
-
   const mailOptions = {
     from: 'lucky.test.mail.send59@gmail.com',
     to,
     subject: 'Подтвердите свой адрес эл. почты',
-    html: `<p>Подтвердите свой адрес эл. почты, чтобы получить доступ к уч. записи "ДДДДД", нажав на след. ссылку <a href="${link}">ссылка</a></p>`
+    html: `<p>Подтвердите свой адрес эл. почты, чтобы получить доступ к уч. записи "ДДДДД", нажав на след. ссылку <a href="${link}">ссылка</a></p>`,
   };
 
   transporter.sendMail(mailOptions, (err, info) => {

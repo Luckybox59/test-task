@@ -18,22 +18,20 @@
 </template>
 
 <script>
-  import axios from 'axios'
-
-  export default {
-    data() {
-      return {
-        user: {
-          email: '',
-          password: ''
-        }
-      }
+export default {
+  data() {
+    return {
+      user: {
+        email: '',
+        password: '',
+      },
+    };
+  },
+  methods: {
+    onSubmit() {
+      this.$store.dispatch('authRequest', this.user)
+        .then(() => this.$router.push({ name: 'profile' }));
     },
-    methods: {
-      onSubmit() {
-        this.$store.dispatch('authRequest', this.user)
-          .then(() => this.$router.push({ name: 'profile' }))
-      }
-    }
-  }
+  },
+};
 </script>

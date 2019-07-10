@@ -6,7 +6,7 @@
           <th>Дата</th>
           <th>Операция</th>
         </tr>
-        <tr v-for="record in records">
+        <tr v-for="(record, index) in records" :key="index">
           <td>{{ record.date }}</td>
           <td>{{ record.action }}</td>
         </tr>
@@ -15,7 +15,7 @@
   </div>
 </template>
 <script>
-  export default {
-    props: ['records']
-  }
+export default {
+  props: ['records'],
+};
 </script>
