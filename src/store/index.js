@@ -14,28 +14,10 @@ export default new Vuex.Store({
         })
         .catch(e => console.error('Пользователь не создан! ' + e.message));
     },
-    userEditTransactions(ctx, transactionProps) {
-      return axios({ method: 'PATCH', url: 'http://localhost:3000/users/edit/transactions', data: transactionProps });
-    },
-    userEditPassword(ctx, user) {
-      return axios({ method: 'PATCH', url: 'http://localhost:3000/users/edit/password', data: user });
-    },
-    userEditProfile(ctx, user) {
-      axios({ method: 'PUT', url: 'http://localhost:3000/users/edit', data: user });
-    },
-    userRequest() {
-      return axios({ method: 'GET', url: 'http://localhost:3000/users' });
-    },
-    balanceRequest() {
-      return axios({ method: 'GET', url: 'http://localhost:3000/users/balance' });
-    },
-    historyRequest() {
-      return axios({ method: 'GET', url: 'http://localhost:3000/users/history' });
-    },
     authLogout({ commit }) {
       return new Promise((resolve, reject) => {
         commit('authLogout');
-        sessionStorage.removeItem('token'); // clear your user's token from localstorage
+        sessionStorage.removeItem('token');
         delete axios.defaults.headers.common['Authorization'];
         resolve();
       });
@@ -53,7 +35,7 @@ export default new Vuex.Store({
           })
           .catch((err) => {
             commit('authError');
-            sessionStorage.removeItem('token'); // if the request fails, remove any possible user token if possible
+            sessionStorage.removeItem('token');
             reject(err);
           });
       });

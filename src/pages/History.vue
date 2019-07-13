@@ -35,7 +35,7 @@ export default {
     };
   },
   mounted() {
-    this.$store.dispatch('historyRequest')
+    this.$http({ method: 'GET', url: 'http://localhost:3000/users/history' })
       .then((resp) => {
         this.records = resp.data;
       });

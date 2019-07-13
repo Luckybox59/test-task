@@ -56,11 +56,11 @@ export default {
       const newBalance = calculateNewBalance(+this.balance, +this.payment.data, +this.deposit.data);
       this.balance = newBalance;
       const { action } = event.target.dataset;
-      this.$store.dispatch('userEditTransactions', { balance: newBalance, action });
+      this.$http({ method: 'PATCH', url: 'http://localhost:3000/users/edit/transactions', data: { balance: newBalance, action } });
     },
   },
   mounted() {
-    this.$store.dispatch('balanceRequest')
+    this.$http({ method: 'GET', url: 'http://localhost:3000/users/balance' })
       .then((resp) => {
         this.balance = resp.data.balance;
       });

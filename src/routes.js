@@ -20,7 +20,8 @@ const router = new VueRouter({
   routes: [
     { path: '/register', name: 'register', component: Register },
     { path: '/login', name: 'login', component: Login },
-    { path: '/my', name: 'my', component: My, beforeEnter: ifAuthenticated,
+    {
+      path: '/my', name: 'my', component: My, beforeEnter: ifAuthenticated,
       children: [
         { path: 'profile', name: 'profile', component: Profile },
         { path: 'balance', name: 'balance', component: Balance },

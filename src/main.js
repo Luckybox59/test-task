@@ -11,6 +11,7 @@ if (token) {
   axios.defaults.headers.common['Authorization'] = token;
 }
 
+Vue.prototype.$http = axios;
 Vue.use(VueRouter);
 Vue.component('Paginate', Paginate);
 

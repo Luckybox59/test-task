@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     onSubmit() {
-      this.$store.dispatch('userEditPassword', this.user)
+      this.$http({ method: 'PATCH', url: 'http://localhost:3000/users/edit/password', data: this.user })
         .then((resp) => {
           this.message = resp.data.message;
         });

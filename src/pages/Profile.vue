@@ -40,11 +40,11 @@ export default {
   },
   methods: {
     onSubmit() {
-      this.$store.dispatch('userEditProfile', this.user);
+      this.$http({ method: 'PUT', url: 'http://localhost:3000/users/edit', data: this.user });
     },
   },
   mounted() {
-    this.$store.dispatch('userRequest')
+    this.$http({ method: 'GET', url: 'http://localhost:3000/users' })
       .then((resp) => {
         this.user = { ...this.user, ...resp.data };
       });
