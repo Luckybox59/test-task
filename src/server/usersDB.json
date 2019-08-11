@@ -1,0 +1,49 @@
+{
+  "numOfRegistrations": 1,
+  "users": [
+    {
+      "id": 1,
+      "firstName": "admin",
+      "lastName": "adminich",
+      "email": "admin@mail.ru",
+      "country": "Russia",
+      "city": "Perm",
+      "password": "$2b$08$.kP2siO140nz/E1.cLPqROTO8NhwSiDk0iqIK/JkQumGQ.TuO4g0u",
+      "balance": 890,
+      "operations": [
+        {
+          "date": "14 мая 2019",
+          "action": "Оплата счета"
+        },
+        {
+          "date": "13 мая 2019",
+          "action": "Оплата счета"
+        },
+        {
+          "date": "12 мая 2019",
+          "action": "Оплата счета"
+        },
+        {
+          "date": "11 мая 2019",
+          "action": "Оплата счета"
+        },
+        {
+          "date": "10 мая 2019",
+          "action": "Пополнение счета"
+        },
+        {
+          "date": "9 мая 2019",
+          "action": "Оплата счета"
+        },
+        {
+          "date": "8 мая 2019",
+          "action": "Оплата счета"
+        },
+        {
+          "date": "7 мая 2019",
+          "action": "Оплата счета"
+        }
+      ]
+    }
+  ]
+}

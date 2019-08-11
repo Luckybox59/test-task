@@ -1,12 +1,5 @@
-let lastId = 0;
-
-const getId = () => {
-  lastId += 1;
-  return lastId;
-};
-
 export default class {
-  constructor({ firstName, lastName, email, country, city, about, password, balance = 0, operations = [] }) {
+  constructor({ id, firstName, lastName, email, country, city, about, password, balance = 0, operations = [] }) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
@@ -15,7 +8,7 @@ export default class {
     this.city = city;
     this.about = about;
     this.password = password;
-    this.id = getId();
+    this.id = id;
     this.balance = balance;
     this.operations = operations;
   }

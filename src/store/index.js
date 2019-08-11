@@ -8,11 +8,11 @@ export default new Vuex.Store({
   actions: {
     userCreateNew({ dispatch }, user) {
       return axios.post('http://localhost:3000/users/new', user)
+        .catch(e => console.error('Пользователь не создан! ' + e.message))
         .then(() => {
           console.info('Пользователь успешно создан!');
-          return dispatch('authRequest', user);
-        })
-        .catch(e => console.error('Пользователь не создан! ' + e.message));
+          dispatch('authRequest', user);
+        });
     },
     authLogout({ commit }) {
       return new Promise((resolve, reject) => {
@@ -25,15 +25,18 @@ export default new Vuex.Store({
     authRequest({ commit }, user) {
       return new Promise((resolve, reject) => {
         commit('authRequest');
-        axios({ url: 'http://localhost:3000/session/new', data: user, method: 'POST' })
+        console.log(user);
+        axios.post('http://localhost:3000/session/new', user)
           .then((resp) => {
-            const token = resp.data.token;
+            console.log('resp');
+            const { token } = resp.data;
             sessionStorage.setItem('token', token);
             axios.defaults.headers.common['Authorization'] = token;
             commit('authSuccess', token);
             resolve(resp);
           })
           .catch((err) => {
+            console.log('error');
             commit('authError');
             sessionStorage.removeItem('token');
             reject(err);

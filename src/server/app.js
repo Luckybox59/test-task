@@ -6,6 +6,7 @@ import _ from 'lodash';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
+import fs from 'fs';
 
 import sendMail from './send-email';
 import User from './entities/User';
@@ -17,37 +18,16 @@ export default () => {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
-  const users = [
-    new User({
-      firstName: 'admin',
-      lastName: 'adminich',
-      email: 'admin@mail.ru',
-      country: 'Russia',
-      city: 'Perm',
-      password: bcrypt.hashSync('asdfgh', 8),
-      balance: 890,
-      operations: [
-        { date: '14 мая 2019', action: 'Оплата счета' },
-        { date: '13 мая 2019', action: 'Оплата счета' },
-        { date: '12 мая 2019', action: 'Оплата счета' },
-        { date: '11 мая 2019', action: 'Оплата счета' },
-        { date: '10 мая 2019', action: 'Пополнение счета' },
-        { date: '9 мая 2019', action: 'Оплата счета' },
-        { date: '8 мая 2019', action: 'Оплата счета' },
-        { date: '7 мая 2019', action: 'Оплата счета' },
-      ],
-    }),
-  ];
+  const filepath = `${__dirname}/usersDB.json`;
 
   const verifyToken = (req, res, next) => {
     const token = req.headers['authorization'];
     if (token) {
       jwt.verify(token, 'supersecret', (err, authData) => {
         if (err) {
-          console.log('verify token: No!');
           res.sendStatus(403);
         } else {
-          console.log('verify token: Yes!');
+          const { users } = res.locals.db;
           res.locals.user = users.find(u => u.id === authData.id);
           next();
         }
@@ -57,12 +37,30 @@ export default () => {
     }
   };
 
+  const readDb = (req, res, next) => {
+    const db = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+    res.locals.db = db;
+    next();
+  };
+
   const readOnlyProps = new Set(['password', 'id', 'verifyEmail', 'balance', 'operations']);
 
-  app.post('/users/new', (req, res) => {
+  app.post('/users/new', readDb, (req, res) => {
+    const { db } = res.locals;
+    const { users } = db;
+    db.numOfRegistrations += 1;
     const { firstName, email, password } = req.body;
-    const user = new User({ firstName, email, password: bcrypt.hashSync(password, 8) });
+    const user = new User({
+      id: db.numOfRegistrations,
+      firstName,
+      email,
+      password: bcrypt.hashSync(password, 8),
+    });
     users.push(user);
+
+    const newDb = JSON.stringify(db, '', 2);
+    fs.writeFileSync(filepath, newDb, 'utf8');
+
     jwt.sign({ id: user.id, email }, 'emailsecret', (err, token) => {
       const verifyLink = `http://localhost:3000/users/new/verify?token=${token}`;
       sendMail(email, verifyLink);
@@ -72,16 +70,19 @@ export default () => {
     });
   });
 
-  app.get('/users/verify/email', (req, res) => {
+  app.get('/users/verify/email', readDb, (req, res) => {
     const { token } = req.query;
     const decoded = jwt.verify(token, 'emailsecret');
+    const { users } = res.locals.db;
     const user = users.find(u => u.id === decoded.id);
     user.verifyEmail = true;
     res.sendfile(`${__dirname}/views/verifyEmail.html`);
   });
 
-  app.post('/session/new', (req, res) => {
+  app.post('/session/new', readDb, (req, res) => {
     const { email, password } = req.body;
+    const { users } = res.locals.db;
+    console.log(req.body);
     const user = users.find(u => u.email === email);
     if (user && bcrypt.compareSync(password, user.password)) {
       jwt.sign({ id: user.id, email }, 'supersecret', { expiresIn: '2h' }, (err, token) => {
@@ -90,57 +91,63 @@ export default () => {
     }
   });
 
-  app.get('/users', verifyToken, (req, res) => {
-    const user = res.locals.user;
-    const { password, ...profile } = user;
+  app.get('/users', readDb, verifyToken, (req, res) => {
+    const { password, ...profile } = res.locals.user;
     res.status(200).json(profile);
   });
 
-  app.put('/users/edit', verifyToken, (req, res) => {
-    const user = res.locals.user;
+  app.put('/users/edit', readDb, verifyToken, (req, res) => {
+    const { db, user } = res.locals;
     const keys = Object.keys(req.body);
     keys.forEach((prop) => {
       if (_.has(user, prop) && !readOnlyProps.has(prop)) {
         user[prop] = req.body[prop];
       }
     });
+
+    const newDb = JSON.stringify(db, '', 2);
+    fs.writeFileSync(filepath, newDb, 'utf8');
+
     res.sendStatus(204);
   });
 
-  app.patch('/users/edit/password', verifyToken, (req, res) => {
-    const user = res.locals.user;
+  app.patch('/users/edit/password', readDb, verifyToken, (req, res) => {
+    const { db, user } = res.locals;
     const { currentPassword, newPassword } = req.body;
-    console.log('userPass: ' + user.password);
     let message = '';
     if (bcrypt.compareSync(currentPassword, user.password)) {
       user.password = bcrypt.hashSync(newPassword, 8);
-      console.log('verify password: Yes!');
       message = 'Пароль успешно измненен!';
+
+      const newDb = JSON.stringify(db, '', 2);
+      fs.writeFileSync(filepath, newDb, 'utf8');
     } else {
-      console.log('verify password: No!');
       message = 'Ошибка! Пароль не был изменен!';
     }
     res.status(200).json({ message });
   });
 
-  app.patch('/users/edit/transactions', verifyToken, (req, res) => {
-    console.log(req.body);
-    const user = res.locals.user;
+  app.patch('/users/edit/transactions', readDb, verifyToken, (req, res) => {
+    const { db, user } = res.locals;
     const { balance, action } = req.body;
     moment.locale('ru');
     const date = moment().format('DD MMMM YYYY');
     user.balance = balance;
     user.operations.unshift({ date, action });
+
+    const newDb = JSON.stringify(db, '', 2);
+    fs.writeFileSync(filepath, newDb, 'utf8');
+
     res.sendStatus(204);
   });
 
-  app.get('/users/history', verifyToken, (req, res) => {
-    const user = res.locals.user;
+  app.get('/users/history', readDb, verifyToken, (req, res) => {
+    const { user } = res.locals;
     res.status(200).json(user.operations);
   });
 
-  app.get('/users/balance', verifyToken, (req, res) => {
-    const user = res.locals.user;
+  app.get('/users/balance', readDb, verifyToken, (req, res) => {
+    const { user } = res.locals;
     res.status(200).json({ balance: user.balance });
   });
 
