@@ -3,3 +3,6 @@ nodemon:
 
 build:
 	npm run buildServer
+
+develop:
+	npm run dev
