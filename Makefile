@@ -1,5 +1,5 @@
 nodemon:
-	nodemon --exec DEBUG=http* babel-node -- src/server/bin/server.js
+	nodemon --watch src/server --ignore src/server/usersDB.json --exec babel-node -- src/server/bin/server.js
 
 build:
 	npm run buildServer
