@@ -6,7 +6,7 @@ import _ from 'lodash';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
-import fs from 'fs';
+import { promises as fs } from 'fs';
 
 import sendMail from './send-email';
 import User from './entities/User';
@@ -18,7 +18,9 @@ export default () => {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
-  const filepath = `${__dirname}/usersDB.json`;
+  const dbPath = `${__dirname}/usersDB.json`;
+  const readOnlyProps = new Set(['password', 'id', 'verifyEmail', 'balance', 'operations']);
+
 
   const verifyToken = (req, res, next) => {
     const token = req.headers['authorization'];
@@ -38,12 +40,13 @@ export default () => {
   };
 
   const readDb = (req, res, next) => {
-    const db = JSON.parse(fs.readFileSync(filepath, 'utf8'));
-    res.locals.db = db;
-    next();
+    fs.readFile(dbPath, 'utf8')
+      .then((data) => {
+        res.locals.db = JSON.parse(data);
+        next();
+      })
+      .catch(err => console.log(`Ошибка чтения БД! ${err}`));
   };
-
-  const readOnlyProps = new Set(['password', 'id', 'verifyEmail', 'balance', 'operations']);
 
   app.post('/users/new', readDb, (req, res) => {
     const { db } = res.locals;
@@ -59,15 +62,21 @@ export default () => {
     users.push(user);
 
     const newDb = JSON.stringify(db, '', 2);
-    fs.writeFileSync(filepath, newDb, 'utf8');
-
-    jwt.sign({ id: user.id, email }, 'emailsecret', (err, token) => {
-      const verifyLink = `http://localhost:3000/users/new/verify?token=${token}`;
-      sendMail(email, verifyLink);
-    });
-    jwt.sign({ id: user.id, email }, 'supersecret', { expiresIn: '2h' }, () => {
-      res.sendStatus(200);
-    });
+    fs.writeFile(dbPath, newDb, 'utf8')
+      .then(() => new Promise((resolve, reject) => {
+        jwt.sign({ id: user.id, email }, 'emailsecret', (err, token) => {
+          if (err) {
+            reject(err);
+          }
+          const verifyLink = `http://localhost:3000/users/new/verify?token=${token}`;
+          sendMail(email, verifyLink);
+          resolve();
+        });
+      }))
+      .then(() => {
+        res.sendStatus(200);
+      })
+      .catch(err => console.log(`Ошибка записи БД! ${err}`));
   });
 
   app.get('/users/verify/email', readDb, (req, res) => {
@@ -82,7 +91,6 @@ export default () => {
   app.post('/session/new', readDb, (req, res) => {
     const { email, password } = req.body;
     const { users } = res.locals.db;
-    console.log(req.body);
     const user = users.find(u => u.email === email);
     if (user && bcrypt.compareSync(password, user.password)) {
       jwt.sign({ id: user.id, email }, 'supersecret', { expiresIn: '2h' }, (err, token) => {
@@ -106,25 +114,29 @@ export default () => {
     });
 
     const newDb = JSON.stringify(db, '', 2);
-    fs.writeFileSync(filepath, newDb, 'utf8');
 
-    res.sendStatus(204);
+    fs.writeFile(dbPath, newDb, 'utf8')
+      .then(() => res.sendStatus(204))
+      .catch(err => console.log(`Ошибка записи БД! ${err}`));
   });
 
   app.patch('/users/edit/password', readDb, verifyToken, (req, res) => {
     const { db, user } = res.locals;
     const { currentPassword, newPassword } = req.body;
     let message = '';
+
     if (bcrypt.compareSync(currentPassword, user.password)) {
       user.password = bcrypt.hashSync(newPassword, 8);
       message = 'Пароль успешно измненен!';
-
-      const newDb = JSON.stringify(db, '', 2);
-      fs.writeFileSync(filepath, newDb, 'utf8');
     } else {
       message = 'Ошибка! Пароль не был изменен!';
     }
-    res.status(200).json({ message });
+
+    const newDb = JSON.stringify(db, '', 2);
+
+    fs.writeFile(dbPath, newDb, 'utf8')
+      .then(() => res.status(200).json({ message }))
+      .catch(err => console.log(`Ошибка записи БД! ${err}`));
   });
 
   app.patch('/users/edit/transactions', readDb, verifyToken, (req, res) => {
@@ -136,9 +148,10 @@ export default () => {
     user.operations.unshift({ date, action });
 
     const newDb = JSON.stringify(db, '', 2);
-    fs.writeFileSync(filepath, newDb, 'utf8');
 
-    res.sendStatus(204);
+    fs.writeFile(dbPath, newDb, 'utf8')
+      .then(() => res.sendStatus(204))
+      .catch(err => console.log(`Ошибка записи БД! ${err}`));
   });
 
   app.get('/users/history', readDb, verifyToken, (req, res) => {
