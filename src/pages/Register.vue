@@ -35,7 +35,11 @@ export default {
   },
   methods: {
     onSubmit() {
-      this.$store.dispatch('userCreateNew', this.user)
+      this.$http({ method: 'POST', url: 'http://localhost:3000/users/new', data: this.user })
+        .then(() => {
+          console.info('Пользователь успешно создан!');
+          return this.$store.dispatch('authRequest', this.user);
+        })
         .then(() => {
           this.$router.push({ name: 'profile' });
         })
